@@ -11,19 +11,19 @@
  *        Company:  Universität Osnabrück
  *
  ******************************************************************************/
-
+#pragma once
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
+#ifdef BUILD_LIBRPLY
+#include <libgen.h>
+#include <rply.h>
+#endif
 
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include <stdlib.h>
-#include <libgen.h>
 #include <math.h>
-#include <rply.h>
 #include <float.h>
 
 #define FILE_FORMAT_NONE 0
@@ -31,39 +31,42 @@
 #define FILE_FORMAT_PLY  2
 
 /* Functions */
-void loadPts( char * ptsfile, size_t idx );
-void mouseMoved( int x, int y );
-void mousePress( int button, int state, int x, int y );
+void loadPts(char* ptsfile, size_t idx);
+void mouseMoved(int x, int y);
+void mousePress(int button, int state, int x, int y);
 void drawScene();
-void keyPressed( unsigned char key, int x, int y );
-void resizeScene( int w, int h );
+void keyPressed(unsigned char key, int x, int y);
+void resizeScene(int w, int h);
 void init();
-int  main( int argc, char ** argv );
+int  main(int argc, char** argv);
 void printHelp();
-uint8_t determineFileFormat( char * filename );
+uint8_t determineFileFormat(char* filename);
 
 /* Type definitions */
-typedef struct {
-	GLdouble x;
-	GLdouble y;
-	GLdouble z;
+typedef struct
+{
+  GLdouble x;
+  GLdouble y;
+  GLdouble z;
 } coord3d_t;
 
-typedef struct {
-	coord3d_t min;
-	coord3d_t max;
+typedef struct
+{
+  coord3d_t min;
+  coord3d_t max;
 } boundingbox_t;
 
-typedef struct {
-	float *       vertices;
-	uint8_t *     colors;
-	uint32_t      pointcount;
-	int           enabled;
-	coord3d_t     trans;
-	coord3d_t     rot;
-	int           selected;
-	char *        name;
-	boundingbox_t boundingbox;
+typedef struct
+{
+  float*        vertices;
+  uint8_t*      colors;
+  uint32_t      pointcount;
+  int           enabled;
+  coord3d_t     trans;
+  coord3d_t     rot;
+  int           selected;
+  char*         name;
+  boundingbox_t boundingbox;
 } cloud_t;
 
 
@@ -80,7 +83,7 @@ int       g_invertroty      =                 -1;
 float     g_zoom            =                  1;
 int       g_color           =                  1;
 float     g_pointsize       =               1.0f;
-cloud_t * g_clouds          =               NULL;
+cloud_t* g_clouds          =               NULL;
 uint32_t  g_cloudcount      =                  0;
 float     g_maxdim          =                  0;
 coord3d_t g_trans_center    =  { 0.0, 0.0, 0.0 };
@@ -90,9 +93,11 @@ float     g_movespeed       =                  1;
 int       g_left            =                -75;
 int       g_datastep        =                  0;
 
-boundingbox_t g_bb = { 
-	{ DBL_MAX, DBL_MAX, DBL_MAX }, 
-	{ DBL_MIN, DBL_MIN, DBL_MIN } };
+boundingbox_t g_bb =
+{
+  { DBL_MAX, DBL_MAX, DBL_MAX },
+  { DBL_MIN, DBL_MIN, DBL_MIN }
+};
 
 /* Define viewer modes */
 
