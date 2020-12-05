@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #ifdef BUILD_LIBRPLY
-#include <libgen.h>
+//#include <libgen.h>
 #include <rply.h>
 #endif
 
