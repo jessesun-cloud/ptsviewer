@@ -17,6 +17,7 @@
 #define min(A,B) ((A)<(B) ? (A) : (B))
 #define max(A,B) ((A)>(B) ? (A) : (B))
 
+extern void load(char* ptsfile, size_t idx);
 #define basename(x) x
 #ifdef BUILD_LIBRPLY
 /*******************************************************************************
@@ -244,16 +245,6 @@ void MergeBbox(boundingbox_t bb)
 void loadPts(char* ptsfile, size_t idx)
 {
   printf("Loading »%s«…\n", ptsfile);
-  char* ext = strstr(ptsfile, ".ptx");
-  if (ext != NULL)
-  {
-#ifdef SUPPORT_PTX
-    void _loadPTX(cloud_t* pCloud, const char* FilePath);
-    _loadPTX(&g_clouds[idx], ptsfile);
-    MergeBbox(g_clouds[idx].boundingbox);
-    return;
-  }
-#endif
 
   /* Open file */
   FILE* f = fopen(ptsfile, "r");
@@ -1177,8 +1168,9 @@ int main(int argc, char** argv)
       break;
     case FILE_FORMAT_UOS:
     default:
-      loadPts(argv[ i + 1 ], i);
+      load(argv[ i + 1 ], i);
     }
+    MergeBbox(g_clouds[i].boundingbox);
     g_clouds[i].name = argv[ i + 1 ];
     g_clouds[i].enabled = 1;
   }
@@ -1259,4 +1251,23 @@ void printHelp()
          " m,<esc>     Leave move mode\n"
         );
 
+}
+
+void _loadPTX(cloud_t* pCloud, const char* FilePath);
+
+void load(char* ptsfile, size_t idx)
+{
+  printf("Loading »%s«…\n", ptsfile);
+#ifdef SUPPORT_PTX
+  char* ext = strstr(ptsfile, ".ptx");
+  if (ext != NULL)
+  {
+    _loadPTX(&g_clouds[idx], ptsfile);
+    return;
+  }
+  else
+#endif
+  {
+    loadPts(ptsfile, idx);
+  }
 }
