@@ -225,6 +225,17 @@ int countValuesPerLine(FILE* f)
 
 }
 
+void MergeBbox(boundingbox_t bb)
+{
+  g_maxdim = max(max(max(g_maxdim, bb.max.x - bb.min.x),
+                     bb.max.y - bb.min.y), bb.max.z - bb.min.z);
+  g_bb.max.x = max(g_bb.max.x, bb.max.x);
+  g_bb.max.y = max(g_bb.max.y, bb.max.y);
+  g_bb.max.z = max(g_bb.max.z, bb.max.z);
+  g_bb.min.x = min(g_bb.min.x, bb.min.x);
+  g_bb.min.y = min(g_bb.min.y, bb.min.y);
+  g_bb.min.z = min(g_bb.min.z, bb.min.z);
+}
 
 /*******************************************************************************
  *         Name:  load_pts
@@ -232,8 +243,17 @@ int countValuesPerLine(FILE* f)
  ******************************************************************************/
 void loadPts(char* ptsfile, size_t idx)
 {
-
   printf("Loading »%s«…\n", ptsfile);
+  char* ext = strstr(ptsfile, ".ptx");
+  if (ext != NULL)
+  {
+#ifdef SUPPORT_PTX
+    void _loadPTX(cloud_t* pCloud, const char* FilePath);
+    _loadPTX(&g_clouds[idx], ptsfile);
+    MergeBbox(g_clouds[idx].boundingbox);
+    return;
+  }
+#endif
 
   /* Open file */
   FILE* f = fopen(ptsfile, "r");
