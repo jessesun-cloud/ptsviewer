@@ -13,7 +13,7 @@
  ******************************************************************************/
 
 #include "ptsviewer.h"
-#include "ImpVertexBuffer.hpp"
+#include "VertexBuffer.hpp"
 #include <vector>
 #include <memory>
 using namespace std;
@@ -23,7 +23,7 @@ using namespace std;
 
 extern void load(char* ptsfile, size_t idx);
 
-vector<std::shared_ptr<ImpVertexBufferVboRender>> _Render;
+vector<std::shared_ptr<VertexBufferVboRender>> _Render;
 
 /* Global variables */
 coord3d_t g_translate = { 0.0, 0.0, 0.0 };
@@ -1211,10 +1211,10 @@ int main(int argc, char** argv)
     MergeBbox(g_clouds[i].boundingbox);
     g_clouds[i].name = argv[ i + 1 ];
     g_clouds[i].enabled = 1;
-    ImpVertexBufferVboRender *pRender = new ImpVertexBufferVboRender();
+    VertexBufferVboRender *pRender = new VertexBufferVboRender();
     pRender->AddRgbPoints(g_clouds[i].pointcount, nullptr,
        g_clouds[i].colors, g_clouds[i].vertices, nullptr);
-    _Render.push_back(shared_ptr< ImpVertexBufferVboRender>(pRender));
+    _Render.push_back(shared_ptr< VertexBufferVboRender>(pRender));
   }
 
   /* Calculate translation to middle of cloud. */

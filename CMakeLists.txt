@@ -7,11 +7,9 @@ set(READER_SUPPORT_E57 OFF CACHE BOOL "Option to open e57.")
 
 set(PUBLIC_HEADERS 
   src/ptsviewer.h  
-  src/ImpVertexBuffer.hpp
 )
 set(PROJECT_SRCS
   src/ptsviewer.cpp
-  src/ImpVertexBuffer.cpp
   reader.cpp
 )
 
@@ -33,3 +31,4 @@ if (READER_SUPPORT_E57)
 	add_definitions(-DSUPPORT_E57)
 	target_link_libraries(${APP} PRIVATE e57reader)
 endif()
+target_link_libraries(${APP} PRIVATE VertexBuffer)
