@@ -13,11 +13,47 @@
  ******************************************************************************/
 
 #include "ptsviewer.h"
+#include "ImpVertexBuffer.hpp"
+#include <vector>
+#include <memory>
+using namespace std;
 
 #define min(A,B) ((A)<(B) ? (A) : (B))
 #define max(A,B) ((A)>(B) ? (A) : (B))
 
 extern void load(char* ptsfile, size_t idx);
+
+vector<std::shared_ptr<ImpVertexBufferVboRender>> _Render;
+
+/* Global variables */
+coord3d_t g_translate = { 0.0, 0.0, 0.0 };
+coord3d_t g_rot = { 0.0, 0.0, 0.0 };
+int       g_window = 0;
+int       g_mx = -1;
+int       g_my = -1;
+int       g_last_mousebtn = -1;
+int       g_invertrotx = -1;
+int       g_invertroty = -1;
+float     g_zoom = 1;
+int       g_color = 1;
+float     g_pointsize = 1.0f;
+cloud_t* g_clouds = NULL;
+uint32_t  g_cloudcount = 0;
+float     g_maxdim = 0;
+coord3d_t g_trans_center = { 0.0, 0.0, 0.0 };
+int       g_showcoord = 0;
+char      g_selection[1024] = "";
+float     g_movespeed = 1;
+int       g_left = -75;
+int       g_datastep = 0;
+int       g_mode = VIEWER_MODE_NORMAL;
+
+boundingbox_t g_bb =
+{
+  { DBL_MAX, DBL_MAX, DBL_MAX },
+  { DBL_MIN, DBL_MIN, DBL_MIN }
+};
+
 #define basename(x) x
 #ifdef BUILD_LIBRPLY
 /*******************************************************************************
@@ -29,7 +65,7 @@ int plyVertexCb(p_ply_argument argument)
 
   struct { float* v; boundingbox_t* b; } * d;
   long int eol;
-  ply_get_argument_user_data(argument, (void*) &d, &eol);
+  ply_get_argument_user_data(argument, (void**) &d, &eol);
   if (eol == 0)
   {
     *(d->v) = ply_get_argument_value(argument);
@@ -62,7 +98,7 @@ int plyColorCb(p_ply_argument argument)
 {
 
   uint8_t** color;
-  ply_get_argument_user_data(argument, (void*) &color, NULL);
+  ply_get_argument_user_data(argument, (void**) &color, NULL);
   ** color = (unsigned int) ply_get_argument_value(argument);
   (*color)++;
   return 1;
@@ -435,7 +471,7 @@ void mousePress(int button, int state, int x, int y)
  ******************************************************************************/
 void drawScene()
 {
-
+  double start = GetTickCount();
   //  glColor4f(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -497,7 +533,8 @@ void drawScene()
       }
 
       /* Draw point cloud */
-      glDrawArrays(GL_POINTS, 0, g_clouds[i].pointcount / (g_datastep + 1));
+      //glDrawArrays(GL_POINTS, 0, g_clouds[i].pointcount / (g_datastep + 1));
+      _Render[i]->DrawPoints(0, g_clouds[i].pointcount, false);
 
       /* Disable colorArray. */
       if (g_clouds[i].colors)
@@ -509,8 +546,6 @@ void drawScene()
 
   /* Reset ClientState */
   glDisableClientState(GL_VERTEX_ARRAY);
-
-
 
 
   /* Print status of clouds at the top of the window. */
@@ -608,9 +643,12 @@ void drawScene()
     glVertex3i(0,          0, g_bb.min.z);
     glEnd();
   }
-
+  double end = GetTickCount();
   glutSwapBuffers();
-
+  static double avg = 0;
+  avg = avg * .9 + 0.1 * (end - start) / 1000.0;
+  int fps = 1 / (avg + 0.0001);
+  printf("test %d\r", fps);
 }
 
 
@@ -1173,6 +1211,10 @@ int main(int argc, char** argv)
     MergeBbox(g_clouds[i].boundingbox);
     g_clouds[i].name = argv[ i + 1 ];
     g_clouds[i].enabled = 1;
+    ImpVertexBufferVboRender *pRender = new ImpVertexBufferVboRender();
+    pRender->AddRgbPoints(g_clouds[i].pointcount, nullptr,
+       g_clouds[i].colors, g_clouds[i].vertices, nullptr);
+    _Render.push_back(shared_ptr< ImpVertexBufferVboRender>(pRender));
   }
 
   /* Calculate translation to middle of cloud. */

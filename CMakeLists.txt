@@ -7,9 +7,11 @@ set(READER_SUPPORT_E57 OFF CACHE BOOL "Option to open e57.")
 
 set(PUBLIC_HEADERS 
   src/ptsviewer.h  
+  src/ImpVertexBuffer.hpp
 )
 set(PROJECT_SRCS
-  src/ptsviewer.c
+  src/ptsviewer.cpp
+  src/ImpVertexBuffer.cpp
   reader.cpp
 )
 
@@ -19,6 +21,7 @@ set(APP "ptsViewer")
 add_executable(${APP} "${PROJECT_SRCS}" "${PUBLIC_HEADERS}" readme)
 AddExternalDependency(${APP} PRIVATE glew)
 AddExternalDependency(${APP} PRIVATE FreeGLUT)
+AddExternalDependency(${APP} PRIVATE Glext)
 if (BUILD_BUILD_LIBRPLY)
   target_link_libraries(${APP} PRIVATE librply)
 endif()

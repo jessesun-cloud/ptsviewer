@@ -4,7 +4,7 @@
 #include <ptxreader.hpp>
 #endif
 
-extern "C"
+//extern "C"
 void _loadPTX(cloud_t* pCloud, const char* FilePath)
 {
 #ifdef SUPPORT_PTX
