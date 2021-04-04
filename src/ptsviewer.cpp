@@ -534,7 +534,7 @@ void drawScene()
 
       /* Draw point cloud */
       //glDrawArrays(GL_POINTS, 0, g_clouds[i].pointcount / (g_datastep + 1));
-      _Render[i]->DrawPoints(0, g_clouds[i].pointcount, false);
+      _Render[i]->DrawPoints(0, -1, false);
 
       /* Disable colorArray. */
       if (g_clouds[i].colors)
@@ -648,7 +648,7 @@ void drawScene()
   static double avg = 0;
   avg = avg * .9 + 0.1 * (end - start) / 1000.0;
   int fps = 1 / (avg + 0.0001);
-  printf("test %d\r", fps);
+  printf("fps %d\r", fps);
 }
 
 
