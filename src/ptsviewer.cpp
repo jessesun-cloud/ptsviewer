@@ -534,7 +534,7 @@ void drawScene()
 
       /* Draw point cloud */
       //glDrawArrays(GL_POINTS, 0, g_clouds[i].pointcount / (g_datastep + 1));
-      _Render[i]->DrawPoints(0, -1, false);
+      _Render[i]->DrawPoints(0, -1);
 
       /* Disable colorArray. */
       if (g_clouds[i].colors)
